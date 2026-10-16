@@ -1,0 +1,366 @@
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tt_um_mattvenn_radio.sch
+.subckt tt_um_mattvenn_radio VGND VDPWR VAPWR ui_in[7] ui_in[6] ui_in[5] ui_in[4] ui_in[3] ui_in[2] ui_in[1] ui_in[0] uo_out[7]
++ uo_out[6] uo_out[5] uo_out[4] uo_out[3] uo_out[2] uo_out[1] uo_out[0] uio_in[7] uio_in[6] uio_in[5] uio_in[4] uio_in[3] uio_in[2] uio_in[1]
++ uio_in[0] uio_out[7] uio_out[6] uio_out[5] uio_out[4] uio_out[3] uio_out[2] uio_out[1] uio_out[0] uio_oe[7] uio_oe[6] uio_oe[5] uio_oe[4]
++ uio_oe[3] uio_oe[2] uio_oe[1] uio_oe[0] ua[7] ua[6] ua[5] ua[4] ua[3] ua[2] ua[1] ua[0] ena clk rst_n
+*.PININFO VGND:B VDPWR:B VAPWR:B ui_in[7:0]:B uo_out[7:0]:B uio_in[7:0]:B uio_out[7:0]:B uio_oe[7:0]:B ua[7:0]:B ena:B clk:B
+*+ rst_n:B
+xdig clk comp dbg_en rst_n rx_en sc_phi1 sc_phi2 tx_en tx_en_n VDPWR VGND trim[7] trim[6] trim[5] trim[4] trim[3] trim[2] trim[1]
++ trim[0] ui_in[7] ui_in[6] ui_in[5] ui_in[4] ui_in[3] ui_in[2] ui_in[1] ui_in[0] uio_in[7] uio_in[6] uio_in[5] uio_in[4] uio_in[3]
++ uio_in[2] uio_in[1] uio_in[0] uio_oe[7] uio_oe[6] uio_oe[5] uio_oe[4] uio_oe[3] uio_oe[2] uio_oe[1] uio_oe[0] uio_out[7] uio_out[6]
++ uio_out[5] uio_out[4] uio_out[3] uio_out[2] uio_out[1] uio_out[0] uo_out[7] uo_out[6] uo_out[5] uo_out[4] uo_out[3] uo_out[2] uo_out[1]
++ uo_out[0] radio_digital
+xana rx_en tx_en tx_en_n dbg_en sc_phi1 sc_phi2 trim[7] trim[6] trim[5] trim[4] trim[3] trim[2] trim[1] trim[0] comp ua[3] ua[4]
++ ua[0] ua[1] ua[2] VDPWR VAPWR VGND radio_analog
+.ends
+
+* expanding   symbol:  radio_analog.sym # of pins=16
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/radio_analog.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/radio_analog.sch
+.subckt radio_analog rx_en tx_en tx_en_n dbg_en sc_phi1 sc_phi2 trim[7] trim[6] trim[5] trim[4] trim[3] trim[2] trim[1] trim[0]
++ comp_out tx_p tx_n rx_p rx_n dbg VDPWR VAPWR VGND
+*.PININFO VDPWR:B VAPWR:B VGND:B rx_en:B tx_en:B tx_en_n:B dbg_en:B sc_phi1:B sc_phi2:B trim[7:0]:B comp_out:B tx_p:B tx_n:B
+*+ rx_p:B rx_n:B dbg:B
+xbias rx_en vcm ib_chain ib_det ib_comp VDPWR VGND bias_gen rref=10k rdiv=200k rtail=250k wpu=2 cc=1p
+xchain rx_p rx_n ib_chain vcm out_p out_n o1p o1n o2p o2n o3p o3n o4p o4n o5p o5n VDPWR VGND lna_chain w1=80 rl1=1k mt1=20 w2=20
++ rl2=4k mt2=6 cs=0.6p cin=2p rb=20k mm=0
+xdet o1p o1n o2p o2n o3p o3n o4p o4n o5p o5n out_p out_n ib_det det VDPWR VGND log_det wd=1 rs=10k cc=100f rb=200k rdet=8k cdet=1p
+xlpf det lpf VGND lpf_rc lr=400 nc=2
+xavg lpf sc_phi1 sc_phi2 avg VDPWR VGND avg_sc ncs=1 nca=2 wcs=7
+xdac trim[0] trim[1] trim[2] trim[3] trim[4] trim[5] trim[6] trim[7] trim VGND r2r
+XCtrim trim VGND sky130_fd_pr__cap_mim_m3_1 W='sqrt((1e-12)/1/2.06e-15)' L='sqrt((1e-12)/1/2.06e-15)' m=1
+xcomp avg lpf trim ib_comp comp_out VDPWR VGND comp_ct w1=20 l1=1 mt1=10 rdeg=0.85Meg mta=2 lref1=68 lref2=204 wcl=22
+xdbg det dbg_en dbg VDPWR VGND dbg_tg wn=2 wp=4
+xtx tx_en tx_en tx_en_n tx_p tx_n VDPWR VAPWR VGND tx_top
+xdeca VAPWR VGND decap_vapwr n=100
+xdecd VDPWR VGND decap_vdpwr n=30
+.ends
+
+
+* expanding   symbol:  bias_gen.sym # of pins=7
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/bias_gen.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/bias_gen.sch
+.subckt bias_gen en vcm ib_chain ib_det ib_comp VDD VSS  rref=10k rdiv=200k rtail=250k wpu=2 cc=1p
+*.PININFO VDD:B VSS:B en:B vcm:B ib_chain:B ib_det:B ib_comp:B
+XMeip enb en VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XMein enb en VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=0.5 nf=1 m=1
+XRd1 vcm VDD VSS sky130_fd_pr__res_xhigh_po_0p35 L='max((rdiv-0)/7379,0.5)' mult=1 m=1
+XRd2 vref vcm VSS sky130_fd_pr__res_xhigh_po_0p35 L='max((rdiv-0)/7379,0.5)' mult=1 m=1
+XRd3 dsw vref VSS sky130_fd_pr__res_xhigh_po_0p35 L='max((rdiv-0)/7379,0.5)' mult=1 m=1
+XMdsw dsw en VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=1 nf=1 m=1
+XCvcm vcm VSS sky130_fd_pr__cap_mim_m3_1 W='sqrt((2e-12)/2/2.06e-15)' L='sqrt((2e-12)/2/2.06e-15)' m=2
+XCvref vref VSS sky130_fd_pr__cap_mim_m3_1 W='sqrt((2e-12)/2/2.06e-15)' L='sqrt((2e-12)/2/2.06e-15)' m=2
+XMpb pb pb VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=4 nf=1 m=1
+XRtail tsw pb VSS sky130_fd_pr__res_xhigh_po_0p35 L='max((rtail-0)/7379,0.5)' mult=1 m=1
+XMtsw tsw en VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=1 nf=1 m=1
+XMpt tail pb VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=4 nf=1 m=1
+XM1 d1 vref tail VDD sky130_fd_pr__pfet_01v8 L=1 W=4 nf=1 m=1
+XM2 ota x tail VDD sky130_fd_pr__pfet_01v8 L=1 W=4 nf=1 m=1
+XM3 d1 d1 VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=2 nf=1 m=1
+XM4 ota d1 VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=2 nf=1 m=1
+XCc ota VSS sky130_fd_pr__cap_mim_m3_1 W='sqrt((cc)/1/2.06e-15)' L='sqrt((cc)/1/2.06e-15)' m=1
+XMpd ota enb VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=1 nf=1 m=1
+XMn pr ota x VSS sky130_fd_pr__nfet_01v8 L=0.5 W=20 nf=2 m=1
+XRref1 xr x VSS sky130_fd_pr__res_high_po_0p69 L='max((rref/2-526)/470.9,0.5)' mult=1 m=1
+XRref2 VSS xr VSS sky130_fd_pr__res_high_po_0p69 L='max((rref/2-526)/470.9,0.5)' mult=1 m=1
+XMpr pr pr VDD VDD sky130_fd_pr__pfet_01v8 L=1 W='wpu' nf=1 m=60
+XMpu pr en VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XMo_ib_chain ib_chain pr VDD VDD sky130_fd_pr__pfet_01v8 L=1 W='wpu' nf=1 m=60
+XMo_ib_det ib_det pr VDD VDD sky130_fd_pr__pfet_01v8 L=1 W='wpu' nf=1 m=2
+XMo_ib_comp ib_comp pr VDD VDD sky130_fd_pr__pfet_01v8 L=1 W='wpu' nf=1 m=1
+XMdum VDD VDD VDD VDD sky130_fd_pr__pfet_01v8 L=1 W='wpu' nf=1 m=5
+.ends
+
+
+* expanding   symbol:  lna_chain.sym # of pins=18
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/lna_chain.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/lna_chain.sch
+.subckt lna_chain inp inn ibias vcm outp outn o1p o1n o2p o2n o3p o3n o4p o4n o5p o5n VDD VSS  w1=80 rl1=1k mt1=20 w2=20 rl2=4k
++ mt2=6 cs=0.6p cin=2p rb=20k mm=0
+*.PININFO VDD:B VSS:B ibias:B vcm:B inp:B inn:B outp:B outn:B o1p:B o1n:B o2p:B o2n:B o3p:B o3n:B o4p:B o4n:B o5p:B o5n:B
+XMref ibias ibias VSS VSS sky130_fd_pr__nfet_01v8 L=0.5 W=6 nf=2 m=1
+XCin_p g1p inp sky130_fd_pr__cap_mim_m3_1 W='sqrt((cin)/1/2.06e-15)' L='sqrt((cin)/1/2.06e-15)' m=1
+XRb_p g1p vcm VSS sky130_fd_pr__res_high_po_0p35 L='max((rb-963)/995,0.5)' mult=1 m=1
+XCin_n g1n inn sky130_fd_pr__cap_mim_m3_1 W='sqrt((cin)/1/2.06e-15)' L='sqrt((cin)/1/2.06e-15)' m=1
+XRb_n g1n vcm VSS sky130_fd_pr__res_high_po_0p35 L='max((rb-963)/995,0.5)' mult=1 m=1
+xa1 g1p g1n ibias o1p o1n VDD VSS amp_dp w='w1' l=0.15 rl='rl1' wt=6 mt='mt1' mm='mm'
+xa2 o1p o1n ibias o2p o2n VDD VSS amp_dpc w='w2' l=0.15 rl='rl2' wt=6 mt='mt2' mm='mm' cs='cs'
+xa3 o2p o2n ibias o3p o3n VDD VSS amp_dpc w='w2' l=0.15 rl='rl2' wt=6 mt='mt2' mm='mm' cs='cs'
+xa4 o3p o3n ibias o4p o4n VDD VSS amp_dpc w='w2' l=0.15 rl='rl2' wt=6 mt='mt2' mm='mm' cs='cs'
+xa5 o4p o4n ibias o5p o5n VDD VSS amp_dpc w='w2' l=0.15 rl='rl2' wt=6 mt='mt2' mm='mm' cs='cs'
+xa6 o5p o5n ibias outp outn VDD VSS amp_dpc w='w2' l=0.15 rl='rl2' wt=6 mt='mt2' mm='mm' cs='cs'
+.ends
+
+
+* expanding   symbol:  log_det.sym # of pins=16
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/log_det.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/log_det.sch
+.subckt log_det t1p t1n t2p t2n t3p t3n t4p t4n t5p t5n t6p t6n ibias_det det VDD VSS  wd=1 rs=10k cc=100f rb=200k rdet=8k cdet=1p
+*.PININFO VDD:B VSS:B ibias_det:B det:B t1p:B t1n:B t2p:B t2n:B t3p:B t3n:B t4p:B t4n:B t5p:B t5n:B t6p:B t6n:B
+XMbias ibias_det ibias_det sb VSS sky130_fd_pr__nfet_01v8 L=0.15 W='wd' nf=1 m=1
+XRs_b VSS sb VSS sky130_fd_pr__res_high_po_0p35 L='max((rs-963)/995,0.5)' mult=1 m=1
+XRdet det VDD VSS sky130_fd_pr__res_high_po_0p69 L='max((rdet-526)/470.9,0.5)' mult=1 m=1
+XCdet det VDD sky130_fd_pr__cap_mim_m3_1 W='sqrt((cdet)/1/2.06e-15)' L='sqrt((cdet)/1/2.06e-15)' m=1
+xd1 t1p t1n ibias_det det VSS det_cell wd='wd' rs='rs' cc='cc' rb='rb'
+xd2 t2p t2n ibias_det det VSS det_cell wd='wd' rs='rs' cc='cc' rb='rb'
+xd3 t3p t3n ibias_det det VSS det_cell wd='wd' rs='rs' cc='cc' rb='rb'
+xd4 t4p t4n ibias_det det VSS det_cell wd='wd' rs='rs' cc='cc' rb='rb'
+xd5 t5p t5n ibias_det det VSS det_cell wd='wd' rs='rs' cc='cc' rb='rb'
+xd6 t6p t6n ibias_det det VSS det_cell wd='wd' rs='rs' cc='cc' rb='rb'
+.ends
+
+
+* expanding   symbol:  lpf_rc.sym # of pins=3
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/lpf_rc.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/lpf_rc.sch
+.subckt lpf_rc in out VSS  lr=400 nc=2
+*.PININFO VSS:B in:B out:B
+XR1 in out VSS sky130_fd_pr__res_xhigh_po_0p35 L='lr' mult=1 m=1
+XC1 out VSS sky130_fd_pr__cap_mim_m3_1 W=30 L=30 m='nc'
+.ends
+
+
+* expanding   symbol:  avg_sc.sym # of pins=6
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/avg_sc.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/avg_sc.sch
+.subckt avg_sc in phi1 phi2 out VDD VSS  ncs=1 nca=2 wcs=7
+*.PININFO VDD:B VSS:B in:B out:B phi1:B phi2:B
+XMiphi1p phi1b phi1 VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XMiphi1n phi1b phi1 VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=0.5 nf=1 m=1
+XMiphi2p phi2b phi2 VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XMiphi2n phi2b phi2 VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=0.5 nf=1 m=1
+XS1n in phi1 cs VSS sky130_fd_pr__nfet_01v8 L=0.15 W=0.5 nf=1 m=1
+XS1p in phi1b cs VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XS2n cs phi2 out VSS sky130_fd_pr__nfet_01v8 L=0.15 W=0.5 nf=1 m=1
+XS2p cs phi2b out VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XCs cs VSS sky130_fd_pr__cap_mim_m3_1 W='wcs' L='wcs' m='ncs'
+XCavg out VSS sky130_fd_pr__cap_mim_m3_1 W=30 L=30 m='nca'
+.ends
+
+
+* expanding   symbol:  r2r.sym # of pins=10
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/r2r.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/r2r.sch
+.subckt r2r b0 b1 b2 b3 b4 b5 b6 b7 out VGND
+*.PININFO b0:B b1:B b2:B b3:B b4:B b5:B b6:B b7:B out:B VGND:B
+XR1 s0 b0 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR2 a0 s0 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR3 s1 a0 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR4 VGND s1 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR5 VGND VGND VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR6 a1 a0 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR7 t1 a1 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR8 b1 t1 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR9 a2 a1 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR10 t2 a2 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR11 b2 t2 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR12 a3 a2 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR13 t3 a3 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR14 b3 t3 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR15 a4 a3 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR16 t4 a4 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR17 b4 t4 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR18 a5 a4 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR19 t5 a5 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR20 b5 t5 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR21 a6 a5 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR22 t6 a6 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR23 b6 t6 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR24 out a6 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR25 t7 out VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR26 b7 t7 VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+XR27 VGND VGND VGND sky130_fd_pr__res_high_po_1p41 L=45 mult=1 m=1
+.ends
+
+
+* expanding   symbol:  comp_ct.sym # of pins=7
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/comp_ct.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/comp_ct.sch
+.subckt comp_ct inp inn trim ibias out VDD VSS  w1=20 l1=1 mt1=10 rdeg=0.85Meg mta=2 lref1=68 lref2=204 wcl=22
+*.PININFO VDD:B VSS:B ibias:B inp:B inn:B trim:B out:B
+XMb ibias ibias VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=2 nf=1 m=1
+XMt1 tail ibias VSS VSS sky130_fd_pr__nfet_01v8 L=2 W='0.455*mt1' nf=1 m=4
+XM1 d1 inp tail VSS sky130_fd_pr__nfet_01v8_lvt L='l1' W='w1' nf=4 m=1
+XM2 d2 inn tail VSS sky130_fd_pr__nfet_01v8_lvt L='l1' W='w1' nf=4 m=1
+XMp1 d1 d1 VDD VDD sky130_fd_pr__pfet_01v8_lvt L=2 W=8 nf=1 m=1
+XMp2 d2 d1 VDD VDD sky130_fd_pr__pfet_01v8_lvt L=2 W=8 nf=1 m=1
+XM3 d1 vref sa VSS sky130_fd_pr__nfet_01v8_lvt L=1 W=8 nf=1 m=1
+XMta_sa sa ibias VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=2 nf=1 m='mta'
+XM4 d2 trim sb VSS sky130_fd_pr__nfet_01v8_lvt L=1 W=8 nf=1 m=1
+XMta_sb sb ibias VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=2 nf=1 m='mta'
+XRdeg sa sb VSS sky130_fd_pr__res_xhigh_po_0p35 L='rdeg/7.37k' mult=1 m=1
+XRr1 vref VDD VSS sky130_fd_pr__res_xhigh_po_0p35 L='lref1' mult=1 m=1
+XRr2 VSS vref VSS sky130_fd_pr__res_xhigh_po_0p35 L='lref2' mult=1 m=1
+XCref vref VSS sky130_fd_pr__cap_mim_m3_1 W=10 L=10 m=1
+XCl d2 VSS sky130_fd_pr__cap_mim_m3_1 W='wcl' L='wcl/2' m=2
+XMp3 o2 d2 VDD VDD sky130_fd_pr__pfet_01v8_lvt L=1 W=4 nf=1 m=1
+XMn3 o2 ibias VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=4.55 nf=1 m=2
+XMip out o2 VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W=2 nf=1 m=1
+XMin out o2 VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=1 nf=1 m=1
+XMdn1 VSS VSS VSS VSS sky130_fd_pr__nfet_01v8_lvt L=1 W=5 nf=1 m=2
+XMdn2 VSS VSS VSS VSS sky130_fd_pr__nfet_01v8_lvt L=1 W=4 nf=1 m=2
+XMdn3 VSS VSS VSS VSS sky130_fd_pr__nfet_01v8 L=2 W=2 nf=1 m=1
+XMdp1 VDD VDD VDD VDD sky130_fd_pr__pfet_01v8_lvt L=1 W=4 nf=1 m=2
+XMdp2 VDD VDD VDD VDD sky130_fd_pr__pfet_01v8_lvt L=1 W=4 nf=1 m=1
+.ends
+
+
+* expanding   symbol:  dbg_tg.sym # of pins=5
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/dbg_tg.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/dbg_tg.sch
+.subckt dbg_tg a en b VDD VSS  wn=2 wp=4
+*.PININFO VDD:B VSS:B en:B a:B b:B
+XMip enb en VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W=1 nf=1 m=1
+XMin enb en VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=0.5 nf=1 m=1
+XMn a en b VSS sky130_fd_pr__nfet_01v8 L=0.15 W='wn' nf=1 m=1
+XMp a enb b VDD sky130_fd_pr__pfet_01v8 L=0.15 W='wp' nf=1 m=1
+.ends
+
+
+* expanding   symbol:  tx_top.sym # of pins=8
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_top.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_top.sch
+.subckt tx_top key en_p en_n out_p out_n VDPWR VAPWR VSS
+*.PININFO VDPWR:B VAPWR:B VSS:B key:B en_p:B en_n:B out_p:B out_n:B
+xring key ring VDPWR VSS tx_ring cw=3.2f
+xls ring a b VDPWR VAPWR VSS tx_ls kn=14 kp=8 wpi=9 wni=3
+xlse_p en_p enh_p enhb_p VDPWR VAPWR VSS tx_ls kn=1 kp=1 wpi=1 wni=0.42
+xdrv_p a enh_p out_p VAPWR VSS tx_drv
+xlse_n en_n enh_n enhb_n VDPWR VAPWR VSS tx_ls kn=1 kp=1 wpi=1 wni=0.42
+xdrv_n b enh_n out_n VAPWR VSS tx_drv
+.ends
+
+
+* expanding   symbol:  decap_vapwr.sym # of pins=2
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/decap_vapwr.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/decap_vapwr.sch
+.subckt decap_vapwr VAPWR VGND  n=100
+*.PININFO VAPWR:B VGND:B
+XMcap VGND VAPWR VGND VGND sky130_fd_pr__nfet_g5v0d10v5 L=5 W=10 nf=1 m='2*n'
+XCmim VAPWR VGND sky130_fd_pr__cap_mim_m3_1 W=10 L=10 m='n'
+.ends
+
+
+* expanding   symbol:  decap_vdpwr.sym # of pins=2
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/decap_vdpwr.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/decap_vdpwr.sch
+.subckt decap_vdpwr VDPWR VGND  n=30
+*.PININFO VDPWR:B VGND:B
+XMcap VGND VDPWR VGND VGND sky130_fd_pr__nfet_01v8 L=5 W=10 nf=1 m='2*n'
+XCmim VDPWR VGND sky130_fd_pr__cap_mim_m3_1 W=10 L=10 m='n'
+.ends
+
+
+* expanding   symbol:  amp_dp.sym # of pins=7
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/amp_dp.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/amp_dp.sch
+.subckt amp_dp inp inn nb outp outn VDD VSS  w=80 l=0.15 rl=1k wt=6 mt=20 mm=0
+*.PININFO VDD:B VSS:B nb:B inp:B inn:B outp:B outn:B
+XRl_p outn VDD VSS sky130_fd_pr__res_high_po_1p41 L='max((rl-278)/230.3,0.5)' mult=1 m=1
+XMp outn inp tail VSS sky130_fd_pr__nfet_01v8 L='l' W='w*(1+mm/2)' nf=4 m=1
+XRl_n outp VDD VSS sky130_fd_pr__res_high_po_1p41 L='max((rl-278)/230.3,0.5)' mult=1 m=1
+XMn outp inn tail VSS sky130_fd_pr__nfet_01v8 L='l' W='w*(1-mm/2)' nf=4 m=1
+XMtail tail nb VSS VSS sky130_fd_pr__nfet_01v8 L=0.5 W='wt' nf=2 m='mt'
+.ends
+
+
+* expanding   symbol:  amp_dpc.sym # of pins=7
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/amp_dpc.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/amp_dpc.sch
+.subckt amp_dpc inp inn nb outp outn VDD VSS  w=20 l=0.15 rl=4k wt=6 mt=6 mm=0 cs=0.6p
+*.PININFO VDD:B VSS:B nb:B inp:B inn:B outp:B outn:B
+XRl_p outn VDD VSS sky130_fd_pr__res_high_po_0p69 L='max((rl-526)/470.9,0.5)' mult=1 m=1
+XMp outn inp sp VSS sky130_fd_pr__nfet_01v8 L='l' W='w*(1+mm/2)' nf=4 m=1
+XMtail_p sp nb VSS VSS sky130_fd_pr__nfet_01v8 L=0.5 W='wt' nf=2 m='mt/2'
+XRl_n outp VDD VSS sky130_fd_pr__res_high_po_0p69 L='max((rl-526)/470.9,0.5)' mult=1 m=1
+XMn outp inn sn VSS sky130_fd_pr__nfet_01v8 L='l' W='w*(1-mm/2)' nf=4 m=1
+XMtail_n sn nb VSS VSS sky130_fd_pr__nfet_01v8 L=0.5 W='wt' nf=2 m='mt/2'
+XCs_a sn sp sky130_fd_pr__cap_mim_m3_1 W='sqrt((cs/2)/1/2.06e-15)' L='sqrt((cs/2)/1/2.06e-15)' m=1
+XCs_b sp sn sky130_fd_pr__cap_mim_m3_1 W='sqrt((cs/2)/1/2.06e-15)' L='sqrt((cs/2)/1/2.06e-15)' m=1
+.ends
+
+
+* expanding   symbol:  det_cell.sym # of pins=5
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/det_cell.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/det_cell.sch
+.subckt det_cell inp inn vb out VSS  wd=1 rs=10k cc=100f rb=200k
+*.PININFO VSS:B vb:B inp:B inn:B out:B
+XCc_p gp inp sky130_fd_pr__cap_mim_m3_1 W='sqrt((cc)/1/2.06e-15)' L='sqrt((cc)/1/2.06e-15)' m=1
+XRb_p gp vb VSS sky130_fd_pr__res_xhigh_po_0p35 L='max((rb-0)/7379,0.5)' mult=1 m=1
+XMp out gp sp VSS sky130_fd_pr__nfet_01v8 L=0.15 W='wd' nf=1 m=1
+XRs_p VSS sp VSS sky130_fd_pr__res_high_po_0p35 L='max((rs-963)/995,0.5)' mult=1 m=1
+XCc_n gn inn sky130_fd_pr__cap_mim_m3_1 W='sqrt((cc)/1/2.06e-15)' L='sqrt((cc)/1/2.06e-15)' m=1
+XRb_n gn vb VSS sky130_fd_pr__res_xhigh_po_0p35 L='max((rb-0)/7379,0.5)' mult=1 m=1
+XMn out gn sn VSS sky130_fd_pr__nfet_01v8 L=0.15 W='wd' nf=1 m=1
+XRs_n VSS sn VSS sky130_fd_pr__res_high_po_0p35 L='max((rs-963)/995,0.5)' mult=1 m=1
+.ends
+
+
+* expanding   symbol:  tx_ring.sym # of pins=4
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_ring.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_ring.sch
+.subckt tx_ring en out VDD VSS  cw=3.2f
+*.PININFO VDD:B VSS:B en:B out:B
+xr0 en r22 VSS VSS VDD VDD out sky130_fd_sc_hd__nand2_2
+xr1 out VSS VSS VDD VDD r1 sky130_fd_sc_hd__inv_2
+xr2 r1 VSS VSS VDD VDD r2 sky130_fd_sc_hd__inv_2
+xr3 r2 VSS VSS VDD VDD r3 sky130_fd_sc_hd__inv_2
+xr4 r3 VSS VSS VDD VDD r4 sky130_fd_sc_hd__inv_2
+xr5 r4 VSS VSS VDD VDD r5 sky130_fd_sc_hd__inv_2
+xr6 r5 VSS VSS VDD VDD r6 sky130_fd_sc_hd__inv_2
+xr7 r6 VSS VSS VDD VDD r7 sky130_fd_sc_hd__inv_2
+xr8 r7 VSS VSS VDD VDD r8 sky130_fd_sc_hd__inv_2
+xr9 r8 VSS VSS VDD VDD r9 sky130_fd_sc_hd__inv_2
+xr10 r9 VSS VSS VDD VDD r10 sky130_fd_sc_hd__inv_2
+xr11 r10 VSS VSS VDD VDD r11 sky130_fd_sc_hd__inv_2
+xr12 r11 VSS VSS VDD VDD r12 sky130_fd_sc_hd__inv_2
+xr13 r12 VSS VSS VDD VDD r13 sky130_fd_sc_hd__inv_2
+xr14 r13 VSS VSS VDD VDD r14 sky130_fd_sc_hd__inv_2
+xr15 r14 VSS VSS VDD VDD r15 sky130_fd_sc_hd__inv_2
+xr16 r15 VSS VSS VDD VDD r16 sky130_fd_sc_hd__inv_2
+xr17 r16 VSS VSS VDD VDD r17 sky130_fd_sc_hd__inv_2
+xr18 r17 VSS VSS VDD VDD r18 sky130_fd_sc_hd__inv_2
+xr19 r18 VSS VSS VDD VDD r19 sky130_fd_sc_hd__inv_2
+xr20 r19 VSS VSS VDD VDD r20 sky130_fd_sc_hd__inv_2
+xr21 r20 VSS VSS VDD VDD r21 sky130_fd_sc_hd__inv_2
+xr22 r21 VSS VSS VDD VDD r22 sky130_fd_sc_hd__inv_2
+.ends
+
+
+* expanding   symbol:  tx_ls.sym # of pins=6
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_ls.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_ls.sch
+.subckt tx_ls in A B VDD VAPWR VSS  kn=14 kp=8 wpi=9 wni=3
+*.PININFO VDD:B VAPWR:B VSS:B in:B A:B B:B
+XMi1p ctrl in VDD VDD sky130_fd_pr__pfet_01v8 L=0.15 W='wpi' nf=1 m=1
+XMi1n ctrl in VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W='wni' nf=1 m=1
+XM8 ctrl_n ctrl VDD VDD sky130_fd_pr__pfet_01v8_hvt L=0.15 W=4 nf=1 m=1
+XM7 ctrl_n ctrl VSS VSS sky130_fd_pr__nfet_01v8 L=0.15 W=1.68 nf=1 m=1
+XM9 A ctrl VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W='0.42*kn' nf=1 m=1
+XM10 B ctrl_n VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W='0.42*kn' nf=1 m=1
+XM11 A B VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W='0.42*kp' nf=1 m=1
+XM12 B A VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W='0.42*kp' nf=1 m=1
+.ends
+
+
+* expanding   symbol:  tx_drv.sym # of pins=5
+** sym_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_drv.sym
+** sch_path: /tools/home/mitch/ci2609/ook-asic-radio/xschem/tx_drv.sch
+.subckt tx_drv in en out VAPWR VSS
+*.PININFO VAPWR:B VSS:B in:B en:B out:B
+XMnap y0 in VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=1.26 nf=1 m=1
+XMnbp y0 en VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=1.26 nf=1 m=1
+XMnan y0 in ns VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=0.84 nf=1 m=1
+XMnbn ns en VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=0.84 nf=1 m=1
+XM1p y1 y0 VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=1.26 nf=1 m=1
+XM1n y1 y0 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=0.42 nf=1 m=1
+XM2p y2 y1 VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=5.04 nf=1 m=1
+XM2n y2 y1 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=1.68 nf=1 m=1
+XM3p y3 y2 VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=20.16 nf=2 m=1
+XM3n y3 y2 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=6.72 nf=1 m=1
+XM4p y4 y3 VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=80.64 nf=8 m=1
+XM4n y4 y3 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=26.88 nf=3 m=1
+XM5p out y4 VAPWR VAPWR sky130_fd_pr__pfet_g5v0d10v5 L=0.5 W=144 nf=14 m=1
+XM5n out y4 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=48 nf=5 m=1
+.ends
+
